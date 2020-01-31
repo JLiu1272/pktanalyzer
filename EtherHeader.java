@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /*
  * -----------------------------------------------------------------------------
@@ -14,6 +15,7 @@ public class EtherHeader {
     private static int DESTINATION_LEN = 6;
     private static int SOURCE_LEN = 6;
     private static int ETHER_LEN = 2;
+    private static int ETHER_TOTAL_LEN = 14;
 
     // The type of header we are printing
     private static String type = "ETHER: ";
@@ -23,14 +25,21 @@ public class EtherHeader {
     // class as it
     private static int startByte = 0;
 
-    public EtherHeader(int cursor) {
+    // The file size of the given bin in bytes
+    private static long fileSize = 0;
+
+    public EtherHeader(int cursor, long fileLen) {
         startByte = cursor;
+        fileSize = fileLen;
     }
 
     public void printEtherHeader(Byte[] data) {
 
         System.out.println(type + "----- " + type + " Header -----");
         System.out.println(type);
+
+        // Packet size
+        System.out.println(type + "Packet size = " + Long.toString(fileSize) + " bytes");
 
         // Destination is 6 bytes, so we endByte is the increment of that
         System.out.println(type + "Destination = " + toHex(data, startByte + DESTINATION_LEN, "MAC") + ",");
@@ -39,7 +48,7 @@ public class EtherHeader {
         System.out.println(type + "Source = " + toHex(data, startByte + SOURCE_LEN, "MAC") + ",");
 
         // Ethertype is 2 bytes, so we endByte is the increment of that
-        System.out.println(type + "Source = " + toHex(data, startByte + ETHER_LEN, "ETHER") + " (IP)");
+        System.out.println(type + "Ethertype = " + toHex(data, startByte + ETHER_LEN, "ETHER") + " (IP)");
 
         System.out.println(type);
     }
@@ -75,51 +84,10 @@ public class EtherHeader {
         return output;
     }
 
-    public static void main(String[] args) throws IOException {
-        File file = new File(args[0]);
-        // Check whether file exist, otherwise do not proceed
-        if (!file.exists() || !file.isFile())
-            return;
-
-        // Obtain the data in terms of bytes
-        Util util = new Util();
-
-        // A cursor indicate where we
-        // last left off for the cursor
-        int cursor = 0;
-
-        // Hex data with spaces
-        byte[] preData = util.parseBytes(file);
-        Byte[] data = util.stripSpaces(preData);
-        util.printBytes(data);
-
-        // Print the data for ethernet header
-        EtherHeader eHeader = new EtherHeader(cursor);
-        eHeader.printEtherHeader(data);
-        cursor = 14;
-
-        // Print the data for IP Header
-        IPHeader ipHeader = new IPHeader(cursor);
-        ipHeader.printIPHeader(data);
-        cursor = cursor + ipHeader.getHeaderLength();
-
-        // Obtain the protocol type and print accordingly
-        int protocol = ipHeader.protocolType();
-
-        if (protocol == pktanalyzer.UDP_PROTOCOL) {
-            UdpHeader udpHeader = new UdpHeader(cursor);
-            udpHeader.printUdpHeader(data);
-        } else if (protocol == pktanalyzer.TCP_PROTOCOL) {
-            TcpHeader tcpHeader = new TcpHeader(cursor);
-            tcpHeader.printTcpHeader(data);
-        } else if (protocol == pktanalyzer.ICMP_PROTOCOL) {
-            IcmpHeader icmpHeader = new IcmpHeader(cursor);
-            icmpHeader.printIcmpHeader(data);
-        }
-
-        // Print the data for TCP Header
-        // TcpHeader tcpHeader = new TcpHeader(cursor);
-        // tcpHeader.printTcpHeader(data);
-
+    /*
+     * Get the size of the packet
+     */
+    private static long getFileSizeBytes(File file) {
+        return file.length();
     }
 }

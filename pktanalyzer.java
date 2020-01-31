@@ -11,6 +11,9 @@ public class pktanalyzer implements Constants {
         // Obtain the data in terms of bytes
         Util util = new Util();
 
+        // THe file length of file
+        long totalFileLen = util.getFileSizeBytes(file);
+
         // A cursor indicate where we
         // last left off for the cursor
         int cursor = 0;
@@ -18,10 +21,10 @@ public class pktanalyzer implements Constants {
         // Hex data with spaces
         byte[] preData = util.parseBytes(file);
         Byte[] data = util.stripSpaces(preData);
-        util.printBytes(data);
+        // util.printBytes(data);
 
         // Print the data for ethernet header
-        EtherHeader eHeader = new EtherHeader(cursor);
+        EtherHeader eHeader = new EtherHeader(cursor, totalFileLen);
         eHeader.printEtherHeader(data);
         cursor = 14;
 

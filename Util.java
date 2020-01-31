@@ -339,7 +339,7 @@ public class Util {
     /*
      * Get the size of the packet
      */
-    private static long getFileSizeBytes(File file) {
+    public long getFileSizeBytes(File file) {
         return file.length();
     }
 }
