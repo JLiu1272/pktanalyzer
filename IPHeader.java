@@ -47,7 +47,7 @@ public class IPHeader implements Constants {
         // * 4 = Print the options flag
         dataTypes.put("Version", new Integer[] { 4, 1, 3 });
         dataTypes.put("Header Length", new Integer[] { 4, 1, 1 });
-        dataTypes.put("Type of service", new Integer[] { 8, 2, 3 });
+        dataTypes.put("(DSCP)", new Integer[] { 8, 2, 3 });
         dataTypes.put("Total length", new Integer[] { 16, 1, 1 });
         dataTypes.put("Identification", new Integer[] { 16, 1, 3 });
         dataTypes.put("Flags", new Integer[] { 3, 2, 3 });
@@ -82,6 +82,12 @@ public class IPHeader implements Constants {
             String binaryChunk = binary.substring(startBit, startBit + bitLen);
 
             printHeaderContent(title, processType, unitNum, binaryChunk);
+
+            if (title == "(DSCP)") {
+                printDSCP(title, binaryChunk, bitLen);
+            } else if (title == "Flags") {
+                printFlagsDetails(title, binaryChunk);
+            }
 
             // Advance the cursor for keeping track of the bit
             startBit += bitLen;
@@ -160,6 +166,34 @@ public class IPHeader implements Constants {
      */
     public int getHeaderLength() {
         return headerLength;
+    }
+
+    /**
+     * Print the DSCP Values
+     * 
+     * @param title
+     * @param binaryChunk
+     */
+    public void printDSCP(String title, String binaryChunk, int bitLen) {
+        Util util = new Util();
+
+        int[] positions = new int[bitLen - 2];
+
+        // Fill the array with the bit length which we want to show
+        for (int i = 0; i < bitLen - 2; i++) {
+            positions[i] = i;
+        }
+
+        // These are the individual bits for the code point
+        String segmentedBits = util.formatBinary(util.showMultiBit(binaryChunk, positions));
+
+        // Codepoint value. Remove the ECN that is why we only take bits 0-5
+        int decimal = Integer.parseInt(binaryChunk.substring(0, bitLen - 1), 2);
+
+        String valueTitle = "Differentiated Services Codepoint";
+
+        String formatted = String.format(type + "\t%s = %s: %d", segmentedBits, valueTitle, decimal);
+        System.out.println(formatted);
     }
 
     /**
@@ -243,13 +277,7 @@ public class IPHeader implements Constants {
         }
         // Print as hexidecimal
         else if (processType == 2) {
-            if (title == "Type of service") {
-                printTypeOfService(title, binaryChunk);
-            } else if (title == "Flags") {
-                printFlagsDetails(title, binaryChunk);
-            } else {
-                util.printHex(title, processType, unitNum, binaryChunk, type);
-            }
+            util.printHex(title, processType, unitNum, binaryChunk, type);
         }
         // Obtain IP Address (i.e 192.1.12.90)
         else if (processType == 3) {

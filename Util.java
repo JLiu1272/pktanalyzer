@@ -143,6 +143,33 @@ public class Util {
     }
 
     /**
+     * We may want to obtain a binary value, but only turn certain bits on, while
+     * others off
+     * 
+     * @param binaryChunk
+     * @param positions
+     * @return
+     */
+    public String showMultiBit(String binaryChunk, int[] positions) {
+
+        // Create a copy of the binary string, and
+        // toggle the bits that we want to show
+        String output = "";
+
+        int posIdx = 0;
+
+        for (int i = 0; i < binaryChunk.length(); i++) {
+            if (posIdx < positions.length && i == positions[posIdx]) {
+                output += binaryChunk.charAt(i);
+                posIdx += 1;
+            } else {
+                output += ".";
+            }
+        }
+        return output;
+    }
+
+    /**
      * A function for only showing one bit at a time
      * 
      * @param pos - the position which we want the bit to show
