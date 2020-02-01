@@ -14,7 +14,7 @@
       "type": "java",
       "name": "Debug (Launch)-pktanalyzer",
       "request": "launch",
-      "args": "pkt/new_tcp_packet1.bin",
+      "args": "pkt/new_udp_packet1.bin",
       "mainClass": "pktanalyzer"
     }
   ]

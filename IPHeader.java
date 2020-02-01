@@ -45,19 +45,19 @@ public class IPHeader implements Constants {
         // * 2 = Convert to hex value
         // * 3 = Obtain IP Address
         // * 4 = Print the options flag
-        dataTypes.put("Version", new Integer[] { 4, 1, 3 });
+        dataTypes.put("Version", new Integer[] { 4, 1, 99 });
         dataTypes.put("Header Length", new Integer[] { 4, 1, 1 });
-        dataTypes.put("(DSCP)", new Integer[] { 8, 2, 3 });
+        dataTypes.put("(DSCP)", new Integer[] { 8, 2, 99 });
         dataTypes.put("Total length", new Integer[] { 16, 1, 1 });
-        dataTypes.put("Identification", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Flags", new Integer[] { 3, 2, 3 });
-        dataTypes.put("Fragment offset", new Integer[] { 13, 1, 1 });
+        dataTypes.put("Identification", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Flags", new Integer[] { 8, 2, 99 });
+        dataTypes.put("Fragment offset", new Integer[] { 8, 1, 1 });
         dataTypes.put("Time to live", new Integer[] { 8, 1, 2 });
-        dataTypes.put("Protocol", new Integer[] { 8, 1, 3 });
-        dataTypes.put("Header checksum", new Integer[] { 16, 2, 3 });
-        dataTypes.put("Source address", new Integer[] { 32, 3, 3 });
-        dataTypes.put("Destination address", new Integer[] { 32, 3, 3 });
-        dataTypes.put("Options", new Integer[] { 0, 4, 3 });
+        dataTypes.put("Protocol", new Integer[] { 8, 1, 99 });
+        dataTypes.put("Header checksum", new Integer[] { 16, 2, 99 });
+        dataTypes.put("Source address", new Integer[] { 32, 3, 99 });
+        dataTypes.put("Destination address", new Integer[] { 32, 3, 99 });
+        dataTypes.put("Options", new Integer[] { 0, 4, 99 });
     }
 
     public void printIPHeader(Byte[] data) {
@@ -81,11 +81,20 @@ public class IPHeader implements Constants {
             int unitNum = dataTypes.get(title)[2];
             String binaryChunk = binary.substring(startBit, startBit + bitLen);
 
-            printHeaderContent(title, processType, unitNum, binaryChunk);
+            if (title != "Flags") {
+                printHeaderContent(title, processType, unitNum, binaryChunk);
+            }
 
             if (title == "(DSCP)") {
                 printDSCP(title, binaryChunk, bitLen);
             } else if (title == "Flags") {
+                String binaryFlagChunk = binary.substring(startBit, startBit + 16);
+                int decimal = Integer.parseInt(binaryFlagChunk, 2);
+                String hex = "0x" + Integer.toHexString(decimal);
+
+                // Print the values
+                String formatted = String.format(type + "%-25s = %20s", title, hex);
+                System.out.println(formatted);
                 printFlagsDetails(title, binaryChunk);
             }
 
@@ -215,8 +224,8 @@ public class IPHeader implements Constants {
         // Create a HashMap to store the options for the resulting values
         ArrayList<Object> bit1 = new ArrayList<>();
         bit1.add(true);
-        bit1.add("do not fragment");
         bit1.add("OK to fragment");
+        bit1.add("do not fragment");
 
         ArrayList<Object> bit2 = new ArrayList<>();
         bit2.add(false);

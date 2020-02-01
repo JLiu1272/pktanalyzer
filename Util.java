@@ -207,6 +207,16 @@ public class Util {
             return " Bytes";
         case 2:
             return " seconds/hops";
+        case 0:
+            return " Echo Reply";
+        case 3:
+            return " Destination Unreachable";
+        case 4:
+            return " Source Quench";
+        case 5:
+            return " Redirect Message";
+        case 8:
+            return " Echo Request";
         default:
             return "";
         }
@@ -248,7 +258,7 @@ public class Util {
                 String hexRaw = bytesToHex(subHex);
 
                 String ascii = hexToAscii(hexRaw);
-                String formatted = String.format(type + "%25s %20s'", hexStr, "\'" + ascii);
+                String formatted = String.format(type + "%s %20s'", hexStr, "\'" + ascii);
                 System.out.println(formatted);
 
                 lastIdx = i;

@@ -11,10 +11,6 @@ public class IcmpHeader {
     // class as it
     private static int startByte = 0;
 
-    // The minimum number of bytes to print for
-    // the data segment
-    private static int MAX_DATA_BYTES = 64;
-
     // A hashmap containing the header keys and
     // their byte length
     LinkedHashMap<String, Integer[]> dataTypes = new LinkedHashMap<>();
@@ -37,10 +33,10 @@ public class IcmpHeader {
         // * 3 = Obtain IP Address
         // * 4 = Print the options flag
         // * 5 = Skip field
-        // * 6 = Unknown
-        dataTypes.put("Type", new Integer[] { 8, 1, 3 });
-        dataTypes.put("Code", new Integer[] { 8, 1, 3 });
-        dataTypes.put("Checksum", new Integer[] { 16, 2, 3 });
+        // * 7 = Unknown
+        dataTypes.put("Type", new Integer[] { 8, 1, 99 });
+        dataTypes.put("Code", new Integer[] { 8, 1, 99 });
+        dataTypes.put("Checksum", new Integer[] { 16, 2, 99 });
     }
 
     public void printIcmpHeader(Byte[] data) {
@@ -71,12 +67,55 @@ public class IcmpHeader {
         System.out.println(type);
     }
 
+    public String getICMPType(int typeNum) {
+        switch (typeNum) {
+        case 0:
+            return " Echo Reply";
+        case 1:
+            return " Reserved";
+        case 2:
+            return " Reserved";
+        case 3:
+            return " Destination Unreachable";
+        case 4:
+            return " Source Quench";
+        case 5:
+            return " Redirect Message";
+        case 8:
+            return " Echo Request";
+        case 9:
+            return " Router Advertisement";
+        case 10:
+            return " Router Solicitation";
+        case 11:
+            return " Time Exceeded";
+        default:
+            return "";
+        }
+    }
+
+    /**
+     * Print the decimal value given the binary value
+     */
+    public void printDecimal(String title, int processType, int unitNum, String binaryChunk, String type) {
+
+        // Convert string to a decimal value
+        int decimal = Integer.parseInt(binaryChunk, 2);
+
+        // The resulting value
+        String result = title == "Type" ? decimal + getICMPType(decimal) : "" + decimal;
+
+        // Print the values
+        String formatted = String.format(type + "%-25s = %20s", title, result);
+        System.out.println(formatted);
+    }
+
     public void printHeaderContent(String title, int processType, int unitNum, String binaryChunk) {
         Util util = new Util();
 
         // Print the decimal value
         if (processType == 1) {
-            util.printDecimal(title, processType, unitNum, binaryChunk, type);
+            printDecimal(title, processType, unitNum, binaryChunk, type);
         } else if (processType == 2) {
             util.printHex(title, processType, unitNum, binaryChunk, type);
         }

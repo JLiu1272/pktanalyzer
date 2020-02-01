@@ -39,11 +39,11 @@ public class UdpHeader {
         // * 4 = Print the options flag
         // * 5 = Skip field
         // * 6 = Unknown
-        dataTypes.put("Source port", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Destination port", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Length", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Checksum", new Integer[] { 16, 2, 3 });
-        dataTypes.put("Data", new Integer[] { 0, 6, 3 });
+        dataTypes.put("Source port", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Destination port", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Length", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Checksum", new Integer[] { 16, 2, 99 });
+        dataTypes.put("Data", new Integer[] { 0, 6, 99 });
     }
 
     public void printUdpHeader(Byte[] data) {

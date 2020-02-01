@@ -46,18 +46,18 @@ public class TcpHeader {
         // * 4 = Print the options flag
         // * 5 = Skip field
         // * 6 = Unknown
-        dataTypes.put("Source port", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Destination port", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Sequence number", new Integer[] { 32, 1, 3 });
-        dataTypes.put("Acknowledgement number", new Integer[] { 32, 1, 3 });
+        dataTypes.put("Source port", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Destination port", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Sequence number", new Integer[] { 32, 1, 99 });
+        dataTypes.put("Acknowledgement number", new Integer[] { 32, 1, 99 });
         dataTypes.put("Data offset", new Integer[] { 4, 1, 1 });
-        dataTypes.put("Reserved", new Integer[] { 6, 6, 3 });
-        dataTypes.put("Flags", new Integer[] { 8, 2, 1 });
-        dataTypes.put("Window", new Integer[] { 16, 1, 3 });
-        dataTypes.put("Checksum", new Integer[] { 16, 2, 3 });
-        dataTypes.put("Urgent Pointer", new Integer[] { 16, 4, 3 });
-        dataTypes.put("Options", new Integer[] { 0, 4, 3 });
-        dataTypes.put("Data", new Integer[] { 5, 4, 3 });
+        dataTypes.put("Reserved", new Integer[] { 3, 6, 99 });
+        dataTypes.put("Flags", new Integer[] { 9, 2, 1 });
+        dataTypes.put("Window", new Integer[] { 16, 1, 99 });
+        dataTypes.put("Checksum", new Integer[] { 16, 2, 99 });
+        dataTypes.put("Urgent Pointer", new Integer[] { 16, 4, 99 });
+        dataTypes.put("Options", new Integer[] { 0, 4, 99 });
+        dataTypes.put("Data", new Integer[] { 5, 4, 99 });
     }
 
     public void printTcpHeader(Byte[] data) {
@@ -85,6 +85,10 @@ public class TcpHeader {
             if (title == "Data") {
                 System.out.println(type + "Data: (first " + MAX_DATA_BYTES + " bytes)");
                 util.printDataInHex(tcpData, type);
+            } else if (title == "Options") {
+                String optionsField = hasOptions ? "yes options" : "no options";
+                String formatted = String.format(type + "%s", optionsField);
+                System.out.println(formatted);
             }
             // For urgent pointer, we determine whether there is an urgent pointer
             // from the flags
@@ -116,8 +120,8 @@ public class TcpHeader {
     public void printFlagsDetails(String title, String binaryChunk) {
         Util util = new Util();
 
-        int offset = 2;
-        int offsetEnd = 8;
+        int offset = 3;
+        int offsetEnd = 9;
 
         // Hold the potential values for printing what the
         // bit value represent
@@ -176,6 +180,14 @@ public class TcpHeader {
 
         // Print the decimal value
         if (processType == 1) {
+
+            if (title == "Data offset") {
+                int decimal = Integer.parseInt(binaryChunk, 2);
+                // If this byte value is greater than 5, then
+                // there is options, otherwise there is no options
+                hasOptions = decimal > 5;
+            }
+
             util.printDecimal(title, processType, unitNum, binaryChunk, type);
         } else if (processType == 2) {
             util.printHex(title, processType, unitNum, binaryChunk, type);
